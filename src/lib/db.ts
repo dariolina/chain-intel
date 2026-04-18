@@ -8,7 +8,9 @@ let db: Database.Database | null = null;
 
 function getDb(): Database.Database {
   if (db) return db;
-  const dbPath = process.env.SQLITE_PATH ?? "./data/justice.db";
+  // Su Vercel il filesystem è read-only, tranne /tmp
+  const defaultPath = process.env.VERCEL ? "/tmp/justice.db" : "./data/justice.db";
+  const dbPath = process.env.SQLITE_PATH ?? defaultPath;
   const dir = path.dirname(dbPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   db = new Database(dbPath);

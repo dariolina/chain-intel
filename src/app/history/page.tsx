@@ -16,7 +16,12 @@ export const metadata: Metadata = {
 };
 
 export default function HistoryPage() {
-  const rows = listSearches(200);
+  let rows: ReturnType<typeof listSearches> = [];
+  try {
+    rows = listSearches(200);
+  } catch {
+    // SQLite non disponibile (es. primo avvio su Vercel) — mostra lista vuota
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:py-14">

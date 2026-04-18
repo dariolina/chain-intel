@@ -20,16 +20,29 @@ export const metadata: Metadata = {
   description: "Statistiche e cronologia delle analisi on-chain.",
 };
 
+const EMPTY_STATS = {
+  total: 0,
+  flagged: 0,
+  byChain: [] as { chain: string; count: number }[],
+  perDay: [] as { day: string; count: number }[],
+};
+
 export default function DashboardPage() {
-  const stats = getStats();
-  const recent = listSearches(8).map((r) => ({
-    id: r.id,
-    address: r.address,
-    chain: r.chain as Chain,
-    kind: r.kind as Kind,
-    severity: r.severity as Severity,
-    createdAt: r.created_at,
-  }));
+  let stats = EMPTY_STATS;
+  let recent: { id: number; address: string; chain: Chain; kind: Kind; severity: Severity; createdAt: string }[] = [];
+  try {
+    stats = getStats();
+    recent = listSearches(8).map((r) => ({
+      id: r.id,
+      address: r.address,
+      chain: r.chain as Chain,
+      kind: r.kind as Kind,
+      severity: r.severity as Severity,
+      createdAt: r.created_at,
+    }));
+  } catch {
+    // SQLite non disponibile (es. first boot su Vercel) — mostra dati vuoti
+  }
 
   const last7 = fillLast7Days(stats.perDay);
   const topChain = stats.byChain[0]?.chain ?? "—";
