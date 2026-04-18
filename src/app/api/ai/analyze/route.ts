@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildAnalysisPrompt, getOpenAI } from "@/lib/openai";
 import { corsHeaders } from "@/lib/cors";
-import { attachAiAnalysis, listSearches } from "@/lib/db";
 import { hit } from "@/lib/rate-limit";
 import type { RiskReport } from "@/lib/types";
 
@@ -66,28 +65,13 @@ export async function POST(req: NextRequest) {
       messages: [{ role: "user", content: prompt }],
     });
 
-    let full = "";
     const encoder = new TextEncoder();
     const rs = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
           for await (const chunk of stream) {
             const delta = chunk.choices?.[0]?.delta?.content ?? "";
-            if (delta) {
-              full += delta;
-              controller.enqueue(encoder.encode(delta));
-            }
-          }
-          try {
-            const recent = listSearches(20).find(
-              (r) =>
-                r.address === report.address &&
-                r.chain === report.chain &&
-                r.kind === report.kind,
-            );
-            if (recent) attachAiAnalysis(recent.id, full);
-          } catch {
-            /* best-effort */
+            if (delta) controller.enqueue(encoder.encode(delta));
           }
           controller.close();
         } catch (err) {

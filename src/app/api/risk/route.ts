@@ -7,7 +7,6 @@ import {
 import { buildRiskReport } from "@/lib/aggregator";
 import { hit } from "@/lib/rate-limit";
 import { corsHeaders } from "@/lib/cors";
-import { recordSearch } from "@/lib/db";
 import type { Kind } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -87,20 +86,12 @@ export async function GET(req: NextRequest) {
   try {
     const normalized =
       chain === "btc" ? address : address.toLowerCase();
-    const { report, cached } = await buildRiskReport({
+    const { report } = await buildRiskReport({
       address: normalized,
       chain,
       kind: kindRaw,
       fresh,
     });
-
-    if (!cached) {
-      try {
-        recordSearch(report);
-      } catch {
-        /* history is best-effort */
-      }
-    }
 
     return NextResponse.json(report, { headers });
   } catch (err) {

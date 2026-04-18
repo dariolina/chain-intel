@@ -5,7 +5,6 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/history", label: "Cronologia" },
   { href: "/docs", label: "API docs" },
   { href: "/status", label: "Status" },
 ];
