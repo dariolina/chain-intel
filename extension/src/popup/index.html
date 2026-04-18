@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Justice Settings</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 360px;
+        min-width: 360px;
+        background: #020617;
+        color: #e2e8f0;
+      }
+
+      main { width: 100%; padding: 12px; }
+
+      h1 {
+        margin: 0 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        margin: 0 0 10px;
+        font-size: 11px;
+        line-height: 1.35;
+        color: #475569;
+      }
+
+      /* ── Settings form ── */
+      .section-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #475569;
+        margin: 0 0 6px;
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #94a3b8;
+      }
+
+      input {
+        display: block;
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #1e293b;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      input:focus-visible {
+        outline: 2px solid #60a5fa;
+        outline-offset: 2px;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 6px;
+        background: #1d4ed8;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 7px 14px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      button:hover { background: #2563eb; }
+
+      #status {
+        font-size: 11px;
+        color: #93c5fd;
+      }
+
+      #status:empty { display: none; }
+
+      /* ── Divider ── */
+      .divider {
+        border: none;
+        border-top: 1px solid #0f172a;
+        margin: 12px 0;
+      }
+
+      /* ── Demo list ── */
+      .demo-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-height: 340px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #1e293b transparent;
+      }
+
+      .demo-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 9px;
+        border-radius: 8px;
+        border: 1px solid #0f172a;
+        background: #080f1e;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.12s, background 0.12s;
+      }
+
+      .demo-item:hover {
+        border-color: #1e293b;
+        background: #0f172a;
+      }
+
+      .demo-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .demo-dot[data-sev="clean"]   { background: #22c55e; }
+      .demo-dot[data-sev="info"]    { background: #60a5fa; }
+      .demo-dot[data-sev="warning"] { background: #f59e0b; }
+      .demo-dot[data-sev="danger"]  { background: #ef4444; box-shadow: 0 0 4px rgba(239,68,68,.6); }
+
+      .demo-info {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .demo-name {
+        font-size: 11px;
+        font-weight: 600;
+        color: #e2e8f0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .demo-addr {
+        font-size: 10px;
+        color: #475569;
+        font-family: "SF Mono", ui-monospace, monospace;
+        margin-top: 1px;
+      }
+
+      .demo-tag {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 999px;
+        flex-shrink: 0;
+      }
+
+      .demo-tag[data-type="wallet"]   { background: #1e293b; color: #94a3b8; }
+      .demo-tag[data-type="contract"] { background: #1e3a5f; color: #93c5fd; }
+      .demo-tag[data-type="exploit"]  { background: #3b0d0d; color: #fca5a5; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Justice ✦</h1>
+      <p class="subtitle">On-chain safety per Etherscan e altri explorer.</p>
+
+      <p class="section-label">Impostazioni</p>
+      <form id="settings-form">
+        <label for="apiBaseUrl">API base URL</label>
+        <input
+          id="apiBaseUrl"
+          name="apiBaseUrl"
+          type="url"
+          autocomplete="off"
+          placeholder="https://your-domain.tld"
+          required
+        />
+        <div class="actions">
+          <button type="submit">Salva</button>
+          <span id="status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <hr class="divider" />
+
+      <p class="section-label">Indirizzi demo — apri su Etherscan</p>
+      <div class="demo-list">
+
+        <!-- ── Wallet EOA ─────────────────────────────── -->
+        <a class="demo-item"
+           href="https://etherscan.io/address/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="info"></span>
+          <span class="demo-info">
+            <span class="demo-name">Vitalik Buterin</span>
+            <span class="demo-addr">0xd8dA…96045</span>
+          </span>
+          <span class="demo-tag" data-type="wallet">Wallet</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0x098B716B8Aaf21512996dC57EB0615e2383E2f96"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="danger"></span>
+          <span class="demo-info">
+            <span class="demo-name">Ronin Bridge Exploiter</span>
+            <span class="demo-addr">0x098B…2f96</span>
+          </span>
+          <span class="demo-tag" data-type="exploit">Exploit</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0x8589427373D6D84E98730D7795D8f6f8731fda16"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="danger"></span>
+          <span class="demo-info">
+            <span class="demo-name">OFAC SDN — sanzionato</span>
+            <span class="demo-addr">0x8589…da16</span>
+          </span>
+          <span class="demo-tag" data-type="wallet">Wallet</span>
+        </a>
+
+        <!-- ── Smart Contract: legittimi ─────────────── -->
+        <a class="demo-item"
+           href="https://etherscan.io/address/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="clean"></span>
+          <span class="demo-info">
+            <span class="demo-name">WETH (Wrapped Ether)</span>
+            <span class="demo-addr">0xC02a…6Cc2</span>
+          </span>
+          <span class="demo-tag" data-type="contract">Contract</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="clean"></span>
+          <span class="demo-info">
+            <span class="demo-name">USDC (Circle)</span>
+            <span class="demo-addr">0xA0b8…eB48</span>
+          </span>
+          <span class="demo-tag" data-type="contract">Contract</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="clean"></span>
+          <span class="demo-info">
+            <span class="demo-name">Uniswap V3: SwapRouter02</span>
+            <span class="demo-addr">0x68b3…Fc45</span>
+          </span>
+          <span class="demo-tag" data-type="contract">Contract</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0x29469395eAf6f95920E59F858042f0e28D98a20B"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="info"></span>
+          <span class="demo-info">
+            <span class="demo-name">Blur: Blend (NFT Lending)</span>
+            <span class="demo-addr">0x2946…a20B</span>
+          </span>
+          <span class="demo-tag" data-type="contract">Contract</span>
+        </a>
+
+        <!-- ── Smart Contract: exploit ────────────────── -->
+        <a class="demo-item"
+           href="https://etherscan.io/address/0xd90e2f925DA726b50C4Ed8D0Fb90Ad053324F31b"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="danger"></span>
+          <span class="demo-info">
+            <span class="demo-name">Tornado Cash Router</span>
+            <span class="demo-addr">0xd90e…F31b</span>
+          </span>
+          <span class="demo-tag" data-type="exploit">Exploit</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0xb66cd966670d962C227B3EABA30a872DbFb995db"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="danger"></span>
+          <span class="demo-info">
+            <span class="demo-name">Euler Finance Exploiter</span>
+            <span class="demo-addr">0xb66c…95db</span>
+          </span>
+          <span class="demo-tag" data-type="exploit">Exploit</span>
+        </a>
+
+        <a class="demo-item"
+           href="https://etherscan.io/address/0x9D5765aE1c95C21D4cc3B1D5bBa71BAd3b012b68"
+           target="_blank" rel="noreferrer">
+          <span class="demo-dot" data-sev="danger"></span>
+          <span class="demo-info">
+            <span class="demo-name">Multichain Exploiter</span>
+            <span class="demo-addr">0x9D57…2b68</span>
+          </span>
+          <span class="demo-tag" data-type="exploit">Exploit</span>
+        </a>
+
+      </div>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

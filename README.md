@@ -23,6 +23,53 @@ rate-limit, CORS per l'estensione, cronologia SQLite e analisi AI.
 - **Docs `/docs`** documentazione API.
 - **CORS** dinamico per `chrome-extension://` per consumo dall'estensione.
 
+## Estensione Chrome (`extension/`)
+
+La cartella `extension/` contiene un'estensione **Manifest V3** costruita con
+**Vite** + [`@crxjs/vite-plugin`](https://crxjs.dev/) + TypeScript puro, senza
+dipendenze UI esterne.
+
+### Come funziona
+
+1. **Content script** — iniettato sui principali blockchain explorer (Etherscan,
+   Arbiscan, Basescan, Optimistic Etherscan, PolygonScan, mempool.space,
+   blockstream.info). Rileva automaticamente indirizzi e hash di transazione
+   dall'URL e dal DOM della pagina (incluse SPA con `pushState`/`replaceState`
+   patchati).
+2. **Service worker (background)** — riceve il messaggio `screen` dal content
+   script, chiama `/api/risk` sul backend Justice configurato, restituisce il
+   `RiskReport` strutturato.
+3. **Risk Panel** — overlay iniettato nella pagina con il risultato: severity
+   colorata, fonti di rischio, pulsante "Aggiorna". Si nasconde se la pagina non
+   contiene target riconoscibili.
+4. **Popup** — permette di configurare l'URL base del backend (default
+   `http://localhost:3000`), salvato in `chrome.storage.sync`.
+
+### Chain supportate (explorer → chain)
+
+| Explorer | Chain |
+|---|---|
+| etherscan.io | Ethereum |
+| basescan.org | Base |
+| arbiscan.io | Arbitrum |
+| optimistic.etherscan.io | Optimism |
+| polygonscan.com | Polygon |
+| mempool.space / blockstream.info | Bitcoin |
+
+### Build e sviluppo estensione
+
+```bash
+cd extension
+npm install
+npm run dev    # watch mode (Vite HMR per estensioni)
+npm run build  # output in dist/, caricabile in chrome://extensions
+npm run test   # unit test parser con Vitest
+```
+
+Carica la cartella `dist/` in **Chrome → Gestione estensioni → Carica
+estensione non pacchettizzata**. Nella popup imposta l'URL del backend Justice
+se diverso da `localhost:3000`.
+
 ## Setup
 
 ```bash
@@ -108,7 +155,9 @@ webapp/
 >
 > The architecture is production-grade: intelligent in-memory caching, per-IP rate limiting, SQLite-backed audit history, dynamic CORS for browser extension integration, and a fully typed REST API — all built on Next.js App Router with zero backend servers to maintain.
 >
-> In a world where billions of dollars move on-chain daily and regulatory scrutiny is accelerating, Justice represents a **foundational primitive for the agentic Web3 stack**: the compliance oracle that any AI agent, wallet, or dApp needs to operate safely and responsibly in decentralized environments.
+> The system ships with a companion **Chrome extension (Manifest V3)** that seamlessly integrates into the user's existing blockchain workflow. It auto-detects addresses and transaction hashes on Etherscan, Arbiscan, Basescan, PolygonScan, Optimistic Etherscan, mempool.space and blockstream.info — surfacing a live risk panel overlay without ever leaving the explorer tab. The extension is the edge layer of an agentic loop: it observes on-chain context, queries the Justice intelligence API, and delivers a structured risk verdict directly inside the tool the user is already using.
+>
+> In a world where billions of dollars move on-chain daily and regulatory scrutiny is accelerating, Justice represents a **foundational primitive for the agentic Web3 stack**: the compliance oracle that any AI agent, wallet, browser, or dApp needs to operate safely and responsibly in decentralized environments.
 
 ---
 

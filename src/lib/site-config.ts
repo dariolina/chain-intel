@@ -8,9 +8,9 @@ export const siteConfig = {
   description:
     "Public on-chain risk screening: aggregate signals for addresses and transactions before you move funds.",
   url: siteUrl(),
+  githubUrl:
+    process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/dariolina/chain-intel",
   extensionChromeUrl:
     process.env.NEXT_PUBLIC_EXTENSION_CHROME_URL ??
-    "https://chrome.google.com/webstore",
-  githubUrl:
-    process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/eternax/chain-intel",
+    "https://github.com/dariolina/chain-intel/tree/main/extension",
 } as const;

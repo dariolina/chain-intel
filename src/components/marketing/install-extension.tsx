@@ -1,5 +1,4 @@
 import { ExternalLink } from "@/components/common/external-link";
-import { siteConfig } from "@/lib/site-config";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +16,7 @@ export function InstallExtension() {
           </p>
         </div>
         <ExternalLink
-          href={siteConfig.extensionChromeUrl}
+          href="https://github.com/dariolina/chain-intel/tree/main/extension"
           className={cn(buttonVariants({ size: "lg" }), "shrink-0")}
         >
           Chrome Web Store
