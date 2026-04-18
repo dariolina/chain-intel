@@ -1,0 +1,20 @@
+"use client";
+
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <NuqsAdapter>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <TooltipProvider>{children}</TooltipProvider>
+      </ThemeProvider>
+    </NuqsAdapter>
+  );
+}
