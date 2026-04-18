@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { parseChainParam } from "@/lib/chain-schema";
-import { fetchRiskReport } from "@/lib/api-client";
+import { buildRiskReport } from "@/lib/aggregator";
 import { isValidAddressForChain } from "@/lib/validate-target";
 import { truncateMiddle } from "@/lib/format";
 import { siteConfig } from "@/lib/site-config";
@@ -52,10 +52,10 @@ export default async function Image({
   let display = truncateMiddle(params.address, 8, 6);
 
   try {
-    const report = await fetchRiskReport({
+    const { report } = await buildRiskReport({
       chain,
       kind: "address",
-      address: params.address,
+      address: params.address.toLowerCase(),
     });
     severity = report.severity;
     summary = report.summary;
